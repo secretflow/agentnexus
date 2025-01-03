@@ -1,0 +1,17 @@
+{
+  "Global": {
+    "metadata": {
+      "title": "{appName} - 构建、部署、扩展，一站式大模型应用研发平台",
+      "description": "{appName} is a low-code platform for developing large model applications, offering a one-stop solution to quickly build, deploy, and scale various applications, significantly reducing development time and costs."
+    }
+  },
+  "/login": {
+    "metadata": {
+      "title": "登录 {appName}"
+    },
+    "page": {
+      "title": "登录你的 {appName} 账号"
+    },
+    "error": {}
+  }
+}

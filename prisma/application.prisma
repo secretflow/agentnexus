@@ -1,0 +1,37 @@
+model Application {
+  id            String     @id @default(cuid())
+  userId        String
+  workspaceId   String
+  name          String
+  image         String?
+  description   String?
+  type          String
+  published     Boolean    @default(false)
+  createdAt     DateTime   @default(now()) @map(name: "created_at")
+  updatedAt     DateTime   @updatedAt @map(name: "updated_at")
+
+  workflows     Workflow[]
+  chatApps      ChatApp[]
+  tokens        Token[]
+  
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([name, workspaceId])
+  @@index([workspaceId])
+  @@map(name: "applications")
+}
+
+model Workflow {
+  id             String       @id @default(cuid())
+  applicationId  String
+  content        Json
+  createdAt      DateTime     @default(now()) @map(name: "created_at")
+  updatedAt      DateTime     @updatedAt @map(name: "updated_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map(name: "workflows")
+}
