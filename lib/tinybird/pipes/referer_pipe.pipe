@@ -1,0 +1,38 @@
+TOKEN "referer_pipe_endpoint_read_5444" READ
+
+NODE unique_users
+SQL >
+
+    SELECT DISTINCT ON (client_id) * FROM users_events_mv ORDER BY timestamp DESC
+
+
+
+NODE referer_users
+SQL >
+
+    %
+    SELECT referer, COUNT(referer) as users
+    FROM unique_users
+    WHERE
+        referer != 'Unknown'
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(device) %} AND device = {{ device }} {% end %}
+        {% if defined(browser) %} AND browser = {{ browser }} {% end %}
+        {% if defined(os) %} AND os = {{ os }} {% end %}
+        {% if defined(referer) %} AND referer = {{ referer }} {% end %}
+        {% if defined(country) %} AND country = {{ country }} {% end %}
+        {% if defined(city) %} AND city = {{ city }} {% end %}
+        {% if defined(region) %} AND region = {{ region }} {% end %}
+        {% if defined(start) %} AND timestamp >= {{ DateTime64(start) }} {% end %}
+        {% if defined(end) %} AND timestamp <= {{ DateTime64(end) }} {% end %}
+    GROUP BY referer
+    ORDER BY users DESC
+
+
+
+NODE endpoint
+SQL >
+
+    SELECT * FROM referer_users
+
+

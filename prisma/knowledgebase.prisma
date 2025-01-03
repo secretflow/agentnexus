@@ -1,0 +1,54 @@
+model Knowledgebase {
+  id                String     @id @default(cuid())
+  userId            String
+  workspaceId       String
+  name              String
+  model             Json
+  image             String?
+  description       String?
+  createdAt         DateTime   @default(now()) @map(name: "created_at")
+  updatedAt         DateTime   @updatedAt @map(name: "updated_at")
+
+  knowledgebaseResources KnowledgebaseResource[]
+  embeddings Embedding[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([name, workspaceId])
+  @@index([workspaceId])
+  @@map(name: "knowledgebases")
+}
+
+model KnowledgebaseResource {
+  id                String     @id @default(cuid())
+  knowledgebaseId   String
+  name              String
+  enabled           Boolean
+  metadata          Json
+  splitConfigs      Json       @map(name: "split_configs")
+  createdAt         DateTime   @default(now()) @map(name: "created_at")
+  updatedAt         DateTime   @updatedAt @map(name: "updated_at")
+
+  embeddings        Embedding[]
+
+  knowledgebase Knowledgebase @relation(fields: [knowledgebaseId], references: [id], onDelete: Cascade)
+
+  @@unique([name, knowledgebaseId])
+  @@index([knowledgebaseId])
+  @@map(name: "knowledgebaseresources")
+}
+
+model Embedding {
+  id              String     @id @default(cuid())
+  resourceid      String
+  knowledgebaseid String
+  content         String
+  embedding       Unsupported("vector")
+
+  knowledgebaseResource KnowledgebaseResource @relation(fields: [resourceid], references: [id], onDelete: Cascade)
+  knowledgebase Knowledgebase @relation(fields: [knowledgebaseid], references: [id], onDelete: Cascade)
+
+  @@index([resourceid])
+  @@map(name: "embeddings")
+}

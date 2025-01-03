@@ -1,0 +1,93 @@
+TOKEN "count_pipe_endpoint_read_1565" READ
+
+NODE count_users
+SQL >
+
+    %
+    SELECT COUNT(DISTINCT client_id) as users
+    FROM users_events_mv
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(device) %} AND device = {{ device }} {% end %}
+        {% if defined(browser) %} AND browser = {{ browser }} {% end %}
+        {% if defined(os) %} AND os = {{ os }} {% end %}
+        {% if defined(referer) %} AND referer = {{ referer }} {% end %}
+        {% if defined(country) %} AND country = {{ country }} {% end %}
+        {% if defined(city) %} AND city = {{ city }} {% end %}
+        {% if defined(region) %} AND region = {{ region }} {% end %}
+        {% if defined(start) %} AND timestamp >= {{ DateTime64(start) }} {% end %}
+        {% if defined(end) %} AND timestamp <= {{ DateTime64(end) }} {% end %}
+
+
+
+NODE count_chats
+SQL >
+
+    %
+    SELECT COUNT(*) as chats
+    FROM chats_events
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(start) %} AND timestamp >= {{ DateTime64(start) }} {% end %}
+        {% if defined(end) %} AND timestamp <= {{ DateTime64(end) }} {% end %}
+
+
+
+NODE messages_with_vote
+SQL >
+
+    SELECT timestamp, app_id, client_id, chat_id, message_id, role, vote
+    FROM messages_events messages
+    LEFT JOIN
+        (SELECT DISTINCT ON (message_id) * FROM message_votes_events ORDER BY timestamp DESC) votes
+        ON messages.message_id = votes.message_id
+
+
+
+NODE count_messages
+SQL >
+
+    %
+    SELECT
+        COUNT(*) as messages,
+        SUM(CASE WHEN vote = 'up' THEN 1 ELSE 0 END) AS up_votes,
+        SUM(CASE WHEN vote = 'down' THEN 1 ELSE 0 END) AS down_votes
+    FROM messages_with_vote
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(start) %} AND timestamp >= {{ DateTime64(start) }} {% end %}
+        {% if defined(end) %} AND timestamp <= {{ DateTime64(end) }} {% end %}
+
+
+
+NODE count_tokens
+SQL >
+
+    %
+    SELECT COUNT(*) as tokens
+    FROM users_events_mv
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(start) %} AND timestamp >= {{ DateTime64(start) }} {% end %}
+        {% if defined(end) %} AND timestamp <= {{ DateTime64(end) }} {% end %}
+
+
+
+NODE endpoint
+SQL >
+
+    %
+    SELECT *
+    FROM
+        {% if eventType == 'users' %} count_users
+        {% elif eventType == 'chats' %} count_chats
+        {% elif eventType == 'messages' %} count_messages
+        {% elif eventType == 'tokens' %} count_tokens
+        {% else %} count_users
+        {% end %}
+
+

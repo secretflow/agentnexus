@@ -1,0 +1,20 @@
+model Token {
+  id             String    @id @default(cuid())
+  name           String
+  hashedKey      String    @unique
+  partialKey     String
+  expires        DateTime?
+  lastUsed       DateTime?
+  rateLimit      Int       @default(60)
+  createdAt      DateTime  @default(now()) @map(name: "created_at")
+  updatedAt      DateTime  @updatedAt @map(name: "updated_at")
+  userId         String
+  applicationId  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([name, applicationId])
+  @@index([applicationId])
+  @@map(name: "tokens")
+}

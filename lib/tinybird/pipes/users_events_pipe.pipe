@@ -1,0 +1,12 @@
+TOKEN "users_events_pipe_endpoint_read_2257" READ
+
+NODE mv
+SQL >
+
+    SELECT timestamp, app_id, client_id, device, browser, os, referer, country, city, region
+    FROM users_events
+
+TYPE materialized
+DATASOURCE users_events_mv
+
+

@@ -1,0 +1,19 @@
+model Workspace {
+  id             String    @id @default(cuid())
+  userId         String
+  name           String
+  image          String?
+  inviteCode     String?   @unique
+  createdAt      DateTime  @default(now()) @map(name: "created_at")
+  updatedAt      DateTime  @updatedAt @map(name: "updated_at")
+
+  applications   Application[]
+  knowledgebases Knowledgebase[]
+  members        Member[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([name, userId])
+  @@index([userId])
+  @@map(name: "workspaces")
+}
