@@ -1,0 +1,7 @@
+.git
+.husky
+.vscode
+.next
+.env.test
+node_modules
+postgres-data

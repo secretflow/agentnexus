@@ -1,0 +1,67 @@
+model ChatApp {
+  id            String     @id @default(cuid())
+  applicationId String
+  model         Json?
+  tool          Json?
+  knowledgebase Json?
+  config        Json?
+  prompt        String?
+  createdAt     DateTime   @default(now()) @map(name: "created_at")
+  updatedAt     DateTime   @updatedAt @map(name: "updated_at")
+
+  chats         Chat[]
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map(name: "chatapps")
+}
+
+model Chat {
+  id             String    @id @default(cuid())
+  title          String
+  clientId       String
+  chatAppId      String
+  createdAt      DateTime  @default(now()) @map(name: "created_at")
+  updatedAt      DateTime  @updatedAt @map(name: "updated_at")
+
+  messages       Message[]
+  votes          Vote[]
+
+  chatApp ChatApp @relation(fields: [chatAppId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@map(name: "chats")
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  chatId         String
+  role           String
+  content        Json
+  createdAt      DateTime  @default(now()) @map(name: "created_at")
+  updatedAt      DateTime  @updatedAt @map(name: "updated_at")
+
+  votes          Vote[]
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@map(name: "messages")
+}
+
+model Vote {
+  id          String    @id @default(cuid())
+  chatId      String
+  messageId   String
+  isUpvoted   Boolean
+  createdAt   DateTime  @default(now()) @map(name: "created_at")
+  updatedAt   DateTime  @updatedAt @map(name: "updated_at")
+
+  chat    Chat    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@index([messageId])
+  @@map(name: "votes")
+}

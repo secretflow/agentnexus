@@ -1,0 +1,287 @@
+TOKEN "timeseries_pipe_endpoint_read_3787" READ
+
+NODE month_intervals
+SQL >
+
+    %
+    WITH
+        toStartOfMonth(
+            toDateTime64({{ DateTime64(start, '2024-02-24 00:00:00.000') }}, 3),
+            {{ String(timezone, 'UTC') }}
+        ) AS start,
+        toStartOfMonth(
+            toDateTime64({{ DateTime64(end, '2024-05-23 00:00:00.000') }}, 3),
+            {{ String(timezone, 'UTC') }}
+        ) AS
+    end,
+    dateDiff('month', start, end
+    ) + 1 AS months_diff
+    SELECT
+        arrayJoin(
+            arrayMap(
+                x -> toDateTime64(start + toIntervalMonth(x), 3, {{ String(timezone, 'UTC') }}),
+                range(0, months_diff)
+            )
+        ) as interval
+
+
+
+NODE day_intervals
+SQL >
+
+    %
+    WITH
+        toStartOfDay(
+            toDateTime64({{ DateTime64(start, '2024-02-24 00:00:00.000') }}, 3),
+            {{ String(timezone, 'UTC') }}
+        ) AS start,
+        toStartOfDay(
+            toDateTime64({{ DateTime64(end, '2024-05-23 00:00:00.000') }}, 3),
+            {{ String(timezone, 'UTC') }}
+        ) AS
+    end
+    SELECT
+        arrayJoin(
+            arrayMap(
+                x -> toDateTime64(toStartOfDay(toDateTime64(x, 3), {{ String(timezone, 'UTC') }}), 3),
+                range(toUInt32(start + 86400), toUInt32(end + 86400),
+                86400
+            )
+        )
+    ) as interval
+
+
+
+NODE hour_intervals
+SQL >
+
+    %
+    WITH
+        toStartOfHour(
+            toDateTime64({{ DateTime64(start, '2024-05-22 00:00:00.000') }}, 3),
+            {{ String(timezone, 'UTC') }}
+        ) AS start,
+        toStartOfHour(
+            toDateTime64({{ DateTime64(end, '2024-05-23 00:00:00.000') }}, 3),
+            {{ String(timezone, 'UTC') }}
+        ) AS
+    end
+    SELECT
+        arrayJoin(
+            arrayMap(x -> toDateTime64(x, 3), range(toUInt32(start + 3600), toUInt32(end + 3600), 3600)
+        )
+    ) as interval
+
+
+
+NODE unique_users
+SQL >
+
+    SELECT DISTINCT ON (client_id) * FROM users_events_mv ORDER BY timestamp DESC
+
+
+
+NODE timeseries_users_data
+SQL >
+
+    %
+    SELECT
+        {% if granularity == "hour" %} toStartOfHour(timestamp, {{ String(timezone, 'UTC') }})
+        {% elif granularity == "month" %}
+            toDateTime64(
+                toStartOfMonth(timestamp, {{ String(timezone, 'UTC') }}),
+                3,
+                {{ String(timezone, 'UTC') }}
+            )
+        {% else %} toDateTime64(toStartOfDay(timestamp, {{ String(timezone, 'UTC') }}), 3)
+        {% end %} AS interval,
+        uniq(*) as users
+    FROM unique_users
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(device) %} AND device = {{ device }} {% end %}
+        {% if defined(browser) %} AND browser = {{ browser }} {% end %}
+        {% if defined(os) %} AND os = {{ os }} {% end %}
+        {% if defined(referer) %} AND referer = {{ referer }} {% end %}
+        {% if defined(country) %} AND country = {{ country }} {% end %}
+        {% if defined(city) %} AND city = {{ city }} {% end %}
+        {% if defined(region) %} AND region = {{ region }} {% end %}
+        AND timestamp >= {{ DateTime(start, '2024-04-25 00:00:00') }}
+        AND timestamp < {{ DateTime(end, '2024-12-23 00:00:00') }}
+    GROUP BY interval
+    ORDER BY interval
+
+
+
+NODE timeseries_users
+SQL >
+
+    %
+    SELECT formatDateTime(interval, '%FT%T.000%z') as start, users
+    FROM
+        {% if granularity == "minute" %} minute_intervals
+        {% elif granularity == "hour" %} hour_intervals
+        {% elif granularity == "month" %} month_intervals
+        {% else %} day_intervals
+        {% end %}
+    LEFT JOIN timeseries_users_data USING interval
+
+
+
+NODE timeseries_chats_data
+SQL >
+
+    %
+    SELECT
+        {% if granularity == "hour" %} toStartOfHour(timestamp, {{ String(timezone, 'UTC') }})
+        {% elif granularity == "month" %}
+            toDateTime64(
+                toStartOfMonth(timestamp, {{ String(timezone, 'UTC') }}),
+                3,
+                {{ String(timezone, 'UTC') }}
+            )
+        {% else %} toDateTime64(toStartOfDay(timestamp, {{ String(timezone, 'UTC') }}), 3)
+        {% end %} AS interval,
+        uniq(*) as chats
+    FROM chats_events
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        AND timestamp >= {{ DateTime(start, '2024-04-25 00:00:00') }}
+        AND timestamp < {{ DateTime(end, '2024-12-23 00:00:00') }}
+    GROUP BY interval
+    ORDER BY interval
+
+
+
+NODE timeseries_chats
+SQL >
+
+    %
+    SELECT formatDateTime(interval, '%FT%T.000%z') as start, chats
+    FROM
+        {% if granularity == "minute" %} minute_intervals
+        {% elif granularity == "hour" %} hour_intervals
+        {% elif granularity == "month" %} month_intervals
+        {% else %} day_intervals
+        {% end %}
+    LEFT JOIN timeseries_chats_data USING interval
+
+
+
+NODE messages_with_vote
+SQL >
+
+    SELECT timestamp, app_id, client_id, chat_id, message_id, role, vote
+    FROM messages_events messages
+    LEFT JOIN
+        (SELECT DISTINCT ON (message_id) * FROM message_votes_events ORDER BY timestamp DESC) votes
+        ON messages.message_id = votes.message_id
+
+
+
+NODE timeseries_messages_data
+SQL >
+
+    %
+    SELECT
+        {% if granularity == "hour" %} toStartOfHour(timestamp, {{ String(timezone, 'UTC') }})
+        {% elif granularity == "month" %}
+            toDateTime64(
+                toStartOfMonth(timestamp, {{ String(timezone, 'UTC') }}),
+                3,
+                {{ String(timezone, 'UTC') }}
+            )
+        {% else %} toDateTime64(toStartOfDay(timestamp, {{ String(timezone, 'UTC') }}), 3)
+        {% end %} AS interval,
+        uniq(*) as messages,
+        SUM(CASE WHEN vote = 'up' THEN 1 ELSE 0 END) AS up_votes,
+        SUM(CASE WHEN vote = 'down' THEN 1 ELSE 0 END) AS down_votes
+    FROM messages_with_vote
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        AND timestamp >= {{ DateTime(start, '2024-04-25 00:00:00') }}
+        AND timestamp < {{ DateTime(end, '2024-12-23 00:00:00') }}
+    GROUP BY interval
+    ORDER BY interval
+
+
+
+NODE timeseries_messages
+SQL >
+
+    %
+    SELECT formatDateTime(interval, '%FT%T.000%z') as start, messages, up_votes, down_votes
+    FROM
+        {% if granularity == "minute" %} minute_intervals
+        {% elif granularity == "hour" %} hour_intervals
+        {% elif granularity == "month" %} month_intervals
+        {% else %} day_intervals
+        {% end %}
+    LEFT JOIN timeseries_messages_data USING interval
+
+
+
+NODE timeseries_tokens_data
+SQL >
+
+    %
+    SELECT
+        {% if granularity == "hour" %} toStartOfHour(timestamp, {{ String(timezone, 'UTC') }})
+        {% elif granularity == "month" %}
+            toDateTime64(
+                toStartOfMonth(timestamp, {{ String(timezone, 'UTC') }}),
+                3,
+                {{ String(timezone, 'UTC') }}
+            )
+        {% else %} toDateTime64(toStartOfDay(timestamp, {{ String(timezone, 'UTC') }}), 3)
+        {% end %} AS interval,
+        uniq(*) as users
+    FROM users_events_mv
+    WHERE
+        true
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(device) %} AND device = {{ device }} {% end %}
+        {% if defined(browser) %} AND browser = {{ browser }} {% end %}
+        {% if defined(os) %} AND os = {{ os }} {% end %}
+        {% if defined(referer) %} AND referer = {{ referer }} {% end %}
+        {% if defined(country) %} AND country = {{ country }} {% end %}
+        {% if defined(city) %} AND city = {{ city }} {% end %}
+        {% if defined(region) %} AND region = {{ region }} {% end %}
+        AND timestamp >= {{ DateTime(start, '2024-04-25 00:00:00') }}
+        AND timestamp < {{ DateTime(end, '2024-12-23 00:00:00') }}
+    GROUP BY interval
+
+
+
+NODE timeseries_tokens
+SQL >
+
+    %
+    SELECT formatDateTime(interval, '%FT%T.000%z') as start, users
+    FROM
+        {% if granularity == "minute" %} minute_intervals
+        {% elif granularity == "hour" %} hour_intervals
+        {% elif granularity == "month" %} month_intervals
+        {% else %} day_intervals
+        {% end %}
+    LEFT JOIN timeseries_users_data USING interval
+
+
+
+NODE endpoint
+SQL >
+
+    %
+    SELECT *
+    FROM
+        {% if eventType == 'users' %} timeseries_users
+        {% elif eventType == 'chats' %} timeseries_chats
+        {% elif eventType == 'messages' %} timeseries_messages
+        {% elif eventType == 'tokens' %} timeseries_tokens
+        {% else %} timeseries_users
+        {% end %}
+
+

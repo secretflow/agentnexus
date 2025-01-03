@@ -1,0 +1,15 @@
+
+model Member {
+  id             String    @id @default(cuid())
+  userId         String
+  workspaceId    String
+  createdAt      DateTime  @default(now()) @map(name: "created_at")
+  updatedAt      DateTime  @updatedAt @map(name: "updated_at")
+  
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace      Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+  @@map(name: "members")
+}

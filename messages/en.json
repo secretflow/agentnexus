@@ -1,0 +1,17 @@
+{
+  "Global": {
+    "metadata": {
+      "title": "{appName} - One-stop platform for building, deploying, and scaling large language model applications",
+      "description": "{appName} is a low-code llm application development platform that helps you build, deploy, and scale your llm applications."
+    }
+  },
+  "/login": {
+    "metadata": {
+      "title": "Sign in to {appName}"
+    },
+    "page": {
+      "title": "Sign in to your {appName} account"
+    },
+    "error": {}
+  }
+}
