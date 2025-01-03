@@ -19,7 +19,7 @@ import { getAiTools } from "@/lib/tools";
 import { uuid } from "@/lib/utils";
 import type { ChatAppProps } from "@/lib/zod";
 import { createAISDKTools } from "@agentic/ai-sdk";
-import { type Message, StreamData, convertToCoreMessages, streamText } from "ai";
+import { type Message, convertToCoreMessages, createDataStreamResponse, streamText } from "ai";
 
 export const GET = withApiKey(async ({ params }) => {
   const { chatId } = params;
@@ -105,54 +105,53 @@ export const POST = withApiKey(async ({ req, params, token }) => {
 
   // request
   try {
-    const streamingData = new StreamData();
-    const result = await streamText({
-      model: languageModel,
-      system: systemPrompt,
-      messages: coreMessages,
-      maxSteps: 5,
-      experimental_activeTools: activeTools,
-      tools: createAISDKTools(...aiTools),
-      onFinish: async ({ response }) => {
-        const responseMessagesWithoutIncompleteToolCalls = sanitizeResponseMessages(
-          response.messages,
-        );
+    return createDataStreamResponse({
+      execute(dataStream) {
+        const result = streamText({
+          model: languageModel,
+          system: systemPrompt,
+          messages: coreMessages,
+          maxSteps: 5,
+          experimental_activeTools: activeTools,
+          tools: createAISDKTools(...aiTools),
+          onFinish: async ({ response }) => {
+            const responseMessagesWithoutIncompleteToolCalls = sanitizeResponseMessages(
+              response.messages,
+            );
 
-        const messages = responseMessagesWithoutIncompleteToolCalls.map((message) => {
-          console.log(message);
-          const messageId = uuid();
+            const messages = responseMessagesWithoutIncompleteToolCalls.map((message) => {
+              const messageId = uuid();
 
-          if (message.role === "assistant") {
-            streamingData.appendMessageAnnotation({
-              messageIdFromServer: messageId,
+              if (message.role === "assistant") {
+                dataStream.writeMessageAnnotation({
+                  messageIdFromServer: messageId,
+                });
+              }
+              return {
+                id: messageId,
+                chatId: id,
+                role: message.role,
+                content: message.content,
+              };
             });
-          }
-          return {
-            id: messageId,
-            chatId: id,
-            role: message.role,
-            content: message.content,
-          };
+            await createChatMessages(messages);
+
+            recordMessages(
+              req,
+              messages.map(({ id, chatId, role }) => {
+                return { appId, clientId: token.id, chatId, messageId: id, role };
+              }),
+            );
+          },
+          experimental_telemetry: {
+            isEnabled: true,
+            functionId: "stream-text",
+          },
         });
-        await createChatMessages(messages);
-        recordMessages(
-          req,
-          messages.map(({ id, chatId, role }) => {
-            return { appId, clientId: token.id, chatId, messageId: id, role };
-          }),
-        );
 
-        streamingData.close();
+        result.mergeIntoDataStream(dataStream);
       },
-      experimental_telemetry: {
-        isEnabled: true,
-        functionId: "stream-text",
-      },
-    });
-
-    return result.toDataStreamResponse({
-      data: streamingData,
-      getErrorMessage: (error) => {
+      onError(error) {
         if (error instanceof Error) {
           return error.message;
         }

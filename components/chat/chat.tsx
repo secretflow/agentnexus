@@ -18,19 +18,20 @@ export function Chat({
   id: string;
   initialMessages: Array<Message>;
 }) {
-  const [apiKey] = useLocalStorage<string>(CHAT_API_KEY, "");
-  const { mutate } = useSWRConfig();
-  const { votes } = useChatVotes();
-
   const { chatApp } = useChatApp();
   const appId = chatApp?.applicationId!;
 
+  const { mutate } = useSWRConfig();
+  const { votes } = useChatVotes();
+
+  const [apiKey] = useLocalStorage<string>(CHAT_API_KEY, "");
   const { messages, setMessages, handleSubmit, input, setInput, append, isLoading, stop } = useChat(
     {
       api: `/api/apps/${appId}/chats/${id}`,
       body: { id },
       headers: { Authorization: `Bearer ${apiKey}` },
       initialMessages,
+      experimental_throttle: 100,
       onFinish: () => {
         mutate(`/api/apps/${appId}/chats`);
       },
@@ -38,7 +39,7 @@ export function Chat({
         if (error instanceof Error) {
           toast.error(error.message);
           // Remove the last message if it is an error message
-          // Is there a better way to interact
+          // Is there a better way to interact?
           setMessages(messages);
         }
       },
