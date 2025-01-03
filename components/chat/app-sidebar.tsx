@@ -10,6 +10,7 @@ import {
   useSidebar,
 } from "@/components/ui";
 import { PlusIcon } from "lucide-react";
+import { Link } from "next-view-transitions";
 import { useParams, useRouter } from "next/navigation";
 import { SidebarHistory } from "./sidebar-history";
 
@@ -23,19 +24,18 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <div className="flex flex-row items-center justify-between">
-            <div
+            <Link
+              href={`/chat/${appId}`}
               onClick={() => {
                 setOpenMobile(false);
-                router.push(`/chat/${appId}`);
-                router.refresh();
               }}
               className="flex flex-row items-center gap-3"
             >
               <span className="cursor-pointer rounded-md px-2 font-semibold text-lg hover:bg-muted">
                 聊天应用
               </span>
-            </div>
-            <Tooltip content="New Chat" align="start">
+            </Link>
+            <Tooltip content="新的聊天" align="end">
               <Button
                 variant="ghost"
                 className="size-8 px-0 text-gray-600"

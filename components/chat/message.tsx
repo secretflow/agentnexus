@@ -42,6 +42,14 @@ const PurePreviewMessage = ({
         )}
 
         <div className="flex w-full flex-col gap-2">
+          {message.experimental_attachments && (
+            <div className="flex flex-row gap-2">
+              {message.experimental_attachments.map((attachment) => (
+                <PreviewAttachment key={attachment.url} attachment={attachment} />
+              ))}
+            </div>
+          )}
+
           {message.content && (
             <div className="flex flex-col gap-4">
               <Markdown>{message.content as string}</Markdown>
@@ -94,14 +102,6 @@ const PurePreviewMessage = ({
             </div>
           )}
 
-          {message.experimental_attachments && (
-            <div className="flex flex-row gap-2">
-              {message.experimental_attachments.map((attachment) => (
-                <PreviewAttachment key={attachment.url} attachment={attachment} />
-              ))}
-            </div>
-          )}
-
           {showActionButton && (
             <MessageActions
               key={`action-${message.id}`}
@@ -121,6 +121,7 @@ const PurePreviewMessage = ({
 export const PreviewMessage = memo(PurePreviewMessage, (prevProps, nextProps) => {
   if (prevProps.isLoading !== nextProps.isLoading) return false;
   if (prevProps.isLoading && nextProps.isLoading) return false;
+  if (prevProps.message.content && nextProps.message.content) return false;
   if (!equal(prevProps.vote, nextProps.vote)) return false;
   return true;
 });

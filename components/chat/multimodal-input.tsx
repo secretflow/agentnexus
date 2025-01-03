@@ -258,10 +258,10 @@ function PureMultimodalInput({
         value={input}
         onChange={handleInput}
         className={cn(
-          "max-h-[calc(75dvh)] min-h-[24px] resize-none overflow-hidden rounded-xl bg-muted text-base",
+          "!text-base max-h-[calc(75dvh)] min-h-[24px] resize-none overflow-hidden rounded-2xl bg-muted pb-10 dark:border-zinc-700",
           className,
         )}
-        rows={3}
+        rows={2}
         autoFocus
         onKeyDown={(event) => {
           if (event.key === "Enter" && !event.shiftKey) {
@@ -276,41 +276,44 @@ function PureMultimodalInput({
         }}
       />
 
-      {isLoading ? (
+      <div className="absolute bottom-0 flex w-fit flex-row justify-start p-2">
         <Button
-          variant="success"
-          icon={<CircleStop size={14} />}
-          className="absolute right-2 bottom-2 m-0.5 size-8 rounded-full border p-1.5 dark:border-zinc-600"
+          className="h-fit rounded-md rounded-bl-lg p-[7px] hover:bg-zinc-200 dark:border-zinc-700 hover:dark:bg-zinc-900"
           onClick={(event) => {
+            toast.info("该功能还在开发中，敬请期待！");
+            return;
             event.preventDefault();
-            stop();
-            setMessages((messages) => sanitizeUIMessages(messages));
+            fileInputRef.current?.click();
           }}
+          variant="ghost"
+          disabled={isLoading}
+          icon={<Paperclip size={14} />}
         />
-      ) : (
-        <Button
-          variant="success"
-          icon={<ArrowUp size={14} />}
-          className="absolute right-2 bottom-2 m-0.5 size-8 rounded-full border p-1.5 dark:border-zinc-600"
-          onClick={(event) => {
-            event.preventDefault();
-            submitForm();
-          }}
-          disabled={input.length === 0 || uploadQueue.length > 0}
-        />
-      )}
-      <Button
-        className="absolute right-11 bottom-2 m-0.5 size-8 rounded-full p-1.5 dark:border-zinc-700"
-        onClick={(event) => {
-          toast.info("该功能还在开发中，敬请期待！");
-          return;
-          event.preventDefault();
-          fileInputRef.current?.click();
-        }}
-        variant="secondary"
-        disabled={isLoading}
-        icon={<Paperclip size={14} />}
-      />
+      </div>
+
+      <div className="absolute right-0 bottom-0 flex w-fit flex-row justify-end p-2">
+        {isLoading ? (
+          <Button
+            icon={<CircleStop size={14} />}
+            className="h-fit rounded-full border p-1.5 dark:border-zinc-600"
+            onClick={(event) => {
+              event.preventDefault();
+              stop();
+              setMessages((messages) => sanitizeUIMessages(messages));
+            }}
+          />
+        ) : (
+          <Button
+            icon={<ArrowUp size={14} />}
+            className="h-fit rounded-full border p-1.5 dark:border-zinc-600"
+            onClick={(event) => {
+              event.preventDefault();
+              submitForm();
+            }}
+            disabled={input.length === 0 || uploadQueue.length > 0}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -319,7 +322,6 @@ export const MultimodalInput = memo(PureMultimodalInput, (prevProps, nextProps) 
   if (prevProps.input !== nextProps.input) return false;
   if (prevProps.isLoading !== nextProps.isLoading) return false;
   if (!equal(prevProps.attachments, nextProps.attachments)) return false;
-  if (!equal(prevProps.messages, nextProps.messages)) return false;
 
   return true;
 });
