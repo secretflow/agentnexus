@@ -25,10 +25,10 @@ export const PreviewAttachment = ({
               className="size-full rounded-md object-cover"
             />
           ) : (
-            <div className=""></div>
+            <div className="" />
           )
         ) : (
-          <div className=""></div>
+          <div className="" />
         )}
 
         {isUploading && (
