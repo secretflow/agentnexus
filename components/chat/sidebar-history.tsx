@@ -146,7 +146,7 @@ export function SidebarHistory() {
     return (
       <SidebarGroup>
         <SidebarGroupContent>
-          <div className="flex w-full flex-row items-center justify-center gap-2 text-sm text-zinc-500">
+          <div className="flex w-full flex-row items-center justify-center gap-2 px-2 text-sm text-zinc-500">
             <div>你的会话列表将会显示在这里</div>
           </div>
         </SidebarGroupContent>

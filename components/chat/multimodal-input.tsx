@@ -2,11 +2,10 @@
 
 import { Button, Textarea } from "@/components/ui";
 import { sanitizeUIMessages } from "@/lib/ai";
-import { useLocalStorage, useMediaQuery } from "@/lib/hooks";
+import { useMediaQuery } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import type { Attachment, ChatRequestOptions, CreateMessage, Message } from "ai";
 import equal from "fast-deep-equal";
-import { motion } from "framer-motion";
 import { ArrowUp, CircleStop, Paperclip } from "lucide-react";
 import type React from "react";
 import {
@@ -21,19 +20,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { PreviewAttachment } from "./preview-attachment";
-
-const suggestedActions = [
-  {
-    title: "What is the weather",
-    label: "in Hangzhou?",
-    action: "What is the weather in Hangzhou?",
-  },
-  {
-    title: "Execute the following python code",
-    label: "random.randint(1, 10)",
-    action: "Execute the following python code: random.randint(1, 10)",
-  },
-];
+import { SuggestedActions } from "./suggested-actions";
 
 function PureMultimodalInput({
   appId,
@@ -88,23 +75,16 @@ function PureMultimodalInput({
     }
   };
 
-  const [localStorageInput, setLocalStorageInput] = useLocalStorage("input", "");
-
   useEffect(() => {
     if (textareaRef.current) {
       const domValue = textareaRef.current.value;
-      // Prefer DOM value over localStorage to handle hydration
-      const finalValue = domValue || localStorageInput || "";
+      const finalValue = domValue || "";
       setInput(finalValue);
       adjustHeight();
     }
     // Only run once after hydration
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    setLocalStorageInput(input);
-  }, [input, setLocalStorageInput]);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -124,12 +104,11 @@ function PureMultimodalInput({
     });
 
     setAttachments([]);
-    setLocalStorageInput("");
 
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
-  }, [attachments, handleSubmit, setAttachments, setLocalStorageInput, width, chatId, appId]);
+  }, [attachments, handleSubmit, setAttachments, width, chatId, appId]);
 
   const uploadFile = async (file: File) => {
     const formData = new FormData();
@@ -184,43 +163,11 @@ function PureMultimodalInput({
     },
     [setAttachments],
   );
-
+  console.log(messages, "yy");
   return (
     <div className="relative flex w-full flex-col gap-4">
       {messages.length === 0 && attachments.length === 0 && uploadQueue.length === 0 && (
-        <div className="grid w-full gap-2 sm:grid-cols-2">
-          {suggestedActions.map((suggestedAction, index) => (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ delay: 0.05 * index }}
-              key={index}
-              className={index > 1 ? "hidden sm:block" : "block"}
-            >
-              <Button
-                text={
-                  <div className="flex items-start gap-1 sm:flex-col">
-                    <span className="font-medium">{suggestedAction.title}</span>
-                    <span className="text-muted-foreground">{suggestedAction.label}</span>
-                  </div>
-                }
-                variant="secondary"
-                onClick={async () => {
-                  if (appId && chatId) {
-                    window.history.replaceState({}, "", `/chat/${appId}/${chatId}`);
-                  }
-
-                  append({
-                    role: "user",
-                    content: suggestedAction.action,
-                  });
-                }}
-                className="h-auto w-full justify-start rounded-xl px-4 py-3.5"
-              />
-            </motion.div>
-          ))}
-        </div>
+        <SuggestedActions append={append} appId={appId} chatId={chatId} />
       )}
 
       <input
@@ -321,6 +268,7 @@ function PureMultimodalInput({
 export const MultimodalInput = memo(PureMultimodalInput, (prevProps, nextProps) => {
   if (prevProps.input !== nextProps.input) return false;
   if (prevProps.isLoading !== nextProps.isLoading) return false;
+  if (prevProps.messages.length !== nextProps.messages.length) return false;
   if (!equal(prevProps.attachments, nextProps.attachments)) return false;
 
   return true;

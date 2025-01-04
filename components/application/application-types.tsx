@@ -1,6 +1,6 @@
 import { Badge, Label, RadioGroup, RadioGroupItem, ToggleGroup, Tooltip } from "@/components/ui";
 import type { ApplicationType } from "@/lib/zod";
-import { Bot, MessageCircleMore, Workflow } from "lucide-react";
+import { Bot, Workflow } from "lucide-react";
 
 export const APPLICATION_CONFIGS: Record<
   ApplicationType,
