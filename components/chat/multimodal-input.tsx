@@ -201,11 +201,11 @@ function PureMultimodalInput({
 
       <Textarea
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="发送消息..."
         value={input}
         onChange={handleInput}
         className={cn(
-          "!text-base max-h-[calc(75dvh)] min-h-[24px] resize-none overflow-hidden rounded-2xl bg-muted pb-10 dark:border-zinc-700",
+          "!text-base max-h-[calc(20dvh)] min-h-[24px] resize-none overflow-hidden rounded-2xl bg-muted pb-10 dark:border-zinc-700",
           className,
         )}
         rows={2}

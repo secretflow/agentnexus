@@ -8,7 +8,7 @@ import {
   responseData,
 } from "@/lib/api";
 import { withApiKey } from "@/lib/auth";
-import { recordChat, recordMessages } from "@/lib/tinybird";
+import { recordChat, recordMessages, recordUsage } from "@/lib/tinybird";
 import { uuid } from "@/lib/utils";
 import type { ChatAppProps } from "@/lib/zod";
 import type { Message } from "ai";
@@ -70,7 +70,7 @@ export const POST = withApiKey(async ({ req, params, token }) => {
           },
         ]);
       },
-      afterCreateChat: async (messages, dataStream) => {
+      afterCreateChat: async (messages, usage, dataStream) => {
         const chatMessages = messages.map((message) => {
           const messageId = uuid();
 
@@ -94,6 +94,14 @@ export const POST = withApiKey(async ({ req, params, token }) => {
             return { appId, clientId: token.id, chatId, messageId: id, role };
           }),
         );
+
+        recordUsage({
+          req,
+          appId,
+          chatId: id,
+          clientId: token.id,
+          ...usage,
+        });
       },
     });
   } catch (error) {

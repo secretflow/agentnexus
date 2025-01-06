@@ -104,6 +104,8 @@ const analyticsItemCount = {
   chats: z.number().optional().describe("The total number of chats"),
   messages: z.number().optional().describe("The total number of messages"),
   users: z.number().optional().describe("The total number of users"),
+  prompt_tokens: z.number().optional().describe("The total number of prompt tokens"),
+  completion_tokens: z.number().optional().describe("The total number of completion tokens"),
   tokens: z.number().optional().describe("The total number of tokens"),
   up_votes: z.number().optional().describe("The total number of up votes"),
   down_votes: z.number().optional().describe("The total number of down votes"),

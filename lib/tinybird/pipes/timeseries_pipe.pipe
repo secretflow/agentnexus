@@ -238,18 +238,11 @@ SQL >
             )
         {% else %} toDateTime64(toStartOfDay(timestamp, {{ String(timezone, 'UTC') }}), 3)
         {% end %} AS interval,
-        uniq(*) as users
-    FROM users_events_mv
+        SUM(prompt_tokens) as prompt_tokens, SUM(completion_tokens) as completion_tokens, SUM(total_tokens) as tokens
+    FROM tokens_events
     WHERE
         true
         {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
-        {% if defined(device) %} AND device = {{ device }} {% end %}
-        {% if defined(browser) %} AND browser = {{ browser }} {% end %}
-        {% if defined(os) %} AND os = {{ os }} {% end %}
-        {% if defined(referer) %} AND referer = {{ referer }} {% end %}
-        {% if defined(country) %} AND country = {{ country }} {% end %}
-        {% if defined(city) %} AND city = {{ city }} {% end %}
-        {% if defined(region) %} AND region = {{ region }} {% end %}
         AND timestamp >= {{ DateTime(start, '2024-04-25 00:00:00') }}
         AND timestamp < {{ DateTime(end, '2024-12-23 00:00:00') }}
     GROUP BY interval
@@ -260,14 +253,14 @@ NODE timeseries_tokens
 SQL >
 
     %
-    SELECT formatDateTime(interval, '%FT%T.000%z') as start, users
+    SELECT formatDateTime(interval, '%FT%T.000%z') as start, prompt_tokens, completion_tokens, tokens
     FROM
         {% if granularity == "minute" %} minute_intervals
         {% elif granularity == "hour" %} hour_intervals
         {% elif granularity == "month" %} month_intervals
         {% else %} day_intervals
         {% end %}
-    LEFT JOIN timeseries_users_data USING interval
+    LEFT JOIN timeseries_tokens_data USING interval
 
 
 
