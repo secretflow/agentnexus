@@ -22,6 +22,7 @@ const OpenAIModelProvider: ModelProvider = {
     return createOpenAI({
       apiKey: this.apiKey,
       baseURL: this.baseURL,
+      compatibility: "strict",
     })(modelId);
   },
 

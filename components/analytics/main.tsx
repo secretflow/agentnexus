@@ -1,6 +1,7 @@
 import { ChatsCard } from "./chats-card";
 import { MessagesCard } from "./messages-card";
 import { TimeseriesChart } from "./timeseries-chart";
+import { TokensCard } from "./tokens-card";
 import { UsersCard } from "./users-card";
 
 export function Main() {
@@ -10,6 +11,7 @@ export function Main() {
         <UsersCard />
         <ChatsCard />
         <MessagesCard />
+        <TokensCard />
       </div>
       <div className="pt-4">
         <TimeseriesChart />

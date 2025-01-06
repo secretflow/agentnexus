@@ -67,8 +67,8 @@ NODE count_tokens
 SQL >
 
     %
-    SELECT COUNT(*) as tokens
-    FROM users_events_mv
+    SELECT SUM(prompt_tokens) AS prompt_tokens, SUM(completion_tokens) AS completion_tokens, SUM(total_tokens) AS tokens
+    FROM tokens_events
     WHERE
         true
         {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}

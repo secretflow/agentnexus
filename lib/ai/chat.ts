@@ -8,6 +8,7 @@ import {
   type CoreToolMessage,
   type CoreUserMessage,
   type DataStreamWriter,
+  type LanguageModelUsage,
   type LanguageModelV1,
   type Message,
   convertToCoreMessages,
@@ -37,6 +38,7 @@ export async function createChatResponse({
   ) => Promise<void>;
   afterCreateChat?: (
     messages: Array<CoreAssistantMessage | CoreToolMessage>,
+    usage: LanguageModelUsage,
     dataStream: DataStreamWriter,
   ) => Promise<void>;
 }) {
@@ -86,8 +88,8 @@ export async function createChatResponse({
         maxSteps: 5,
         experimental_activeTools: activeTools,
         tools: createAISDKTools(...aiTools),
-        onFinish: async ({ response }) => {
-          await afterCreateChat?.(sanitizeResponseMessages(response.messages), dataStream);
+        onFinish: async ({ response, usage }) => {
+          await afterCreateChat?.(sanitizeResponseMessages(response.messages), usage, dataStream);
         },
         experimental_telemetry: {
           isEnabled: true,

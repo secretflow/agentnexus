@@ -1,0 +1,13 @@
+
+SCHEMA >
+    `timestamp` DateTime64(3) `json:$.timestamp`,
+    `chat_id` String `json:$.chat_id`,
+    `app_id` String `json:$.app_id`,
+    `client_id` String `json:$.client_id`,
+    `prompt_tokens` Int32 `json:$.prompt_tokens`,
+    `completion_tokens` Int32 `json:$.completion_tokens`,
+    `total_tokens` Int32 `json:$.total_tokens`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp, app_id"

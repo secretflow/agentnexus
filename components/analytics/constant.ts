@@ -1,5 +1,5 @@
 import type { AnalyticsEvent } from "@/lib/zod";
-import { MessageCircleMore, MessageSquareText, Users } from "lucide-react";
+import { Coins, MessageCircleMore, MessageSquareText, Users } from "lucide-react";
 
 export const Analytics_EVENT_ATTR: Record<
   AnalyticsEvent,
@@ -21,8 +21,8 @@ export const Analytics_EVENT_ATTR: Record<
     icon: MessageCircleMore,
   },
   tokens: {
-    title: "用户数",
-    description: "通过身份验证的用户数",
-    icon: Users,
+    title: "Tokens",
+    description: "消耗的 Tokens 总数",
+    icon: Coins,
   },
 };
