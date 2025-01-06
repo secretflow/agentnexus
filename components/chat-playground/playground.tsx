@@ -20,13 +20,13 @@ export function ChatPlayground() {
 
   useEffect(() => {
     if (chatApplication) {
-      const { model, prompt, tool, config, knowledgebase } = chatApplication;
+      const { model, prompt, tools, config, knowledgebases } = chatApplication;
       setChatAppConfigs({
         model,
         prompt,
-        tool,
+        tools,
         config,
-        knowledgebase,
+        knowledgebases,
       });
     }
   }, [chatApplication]);
@@ -70,17 +70,17 @@ export function ChatPlayground() {
           }}
         />
         <ToolsForm
-          value={chatAppConfigs.tool}
-          onValueChange={(tool) => {
-            setChatAppConfigs((prev) => ({ ...prev, tool }));
-            handleSubmit({ tool });
+          value={chatAppConfigs.tools}
+          onValueChange={(tools) => {
+            setChatAppConfigs((prev) => ({ ...prev, tools }));
+            handleSubmit({ tools });
           }}
         />
         <KnowledgebasesForm
-          knowledgebases={chatAppConfigs.knowledgebase}
-          onKnowledgebasesChange={(knowledgebase) => {
-            setChatAppConfigs((prev) => ({ ...prev, knowledgebase }));
-            handleSubmit({ knowledgebase });
+          knowledgebases={chatAppConfigs.knowledgebases}
+          onKnowledgebasesChange={(knowledgebases) => {
+            setChatAppConfigs((prev) => ({ ...prev, knowledgebases }));
+            handleSubmit({ knowledgebases });
           }}
           recallConfig={chatAppConfigs.config?.recall}
           onRecallConfigChange={(recall) => {
@@ -97,9 +97,9 @@ export function ChatPlayground() {
         <Chat
           model={chatAppConfigs.model}
           prompt={chatAppConfigs.prompt}
-          tools={chatAppConfigs.tool}
+          tools={chatAppConfigs.tools}
           config={chatAppConfigs.config}
-          knowledgebases={chatAppConfigs.knowledgebase}
+          knowledgebases={chatAppConfigs.knowledgebases}
           initialMessages={[]}
         />
       </div>

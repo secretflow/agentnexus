@@ -1,15 +1,15 @@
 model ChatApp {
-  id            String     @id @default(cuid())
-  applicationId String
-  model         Json?
-  tool          Json?
-  knowledgebase Json?
-  config        Json?
-  prompt        String?
-  createdAt     DateTime   @default(now()) @map(name: "created_at")
-  updatedAt     DateTime   @updatedAt @map(name: "updated_at")
+  id             String     @id @default(cuid())
+  applicationId  String
+  model          Json?
+  tools          Json?
+  knowledgebases Json?
+  config         Json?
+  prompt         String?
+  createdAt      DateTime   @default(now()) @map(name: "created_at")
+  updatedAt      DateTime   @updatedAt @map(name: "updated_at")
 
-  chats         Chat[]
+  chats          Chat[]
 
   application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 

@@ -26,8 +26,8 @@ export const ChatAppSchema = z.object({
   id: z.string().describe("The unique ID of the chatapp."),
   applicationId: z.string().describe("The application ID of the chatapp."),
   model: ModelSchema.describe("The model of the chatapp."),
-  tool: z.array(ChatToolSchema).describe("The tool of the chatapp."),
-  knowledgebase: z.array(ChatKnowledgebaseSchema).describe("The knowledgebase of the chatapp."),
+  tools: z.array(ChatToolSchema).describe("The tools of the chatapp."),
+  knowledgebases: z.array(ChatKnowledgebaseSchema).describe("The knowledgebases of the chatapp."),
   config: ChatConfigSchema.describe("The config of the chatapp."),
   prompt: z.string().describe("The prompt of the chatapp."),
   createdAt: z.date().describe("The created timestamp of the chatapp."),
@@ -61,8 +61,8 @@ export const MessageVoteSchema = z.object({
 export const UpsertChatAppSchema = ChatAppSchema.pick({
   model: true,
   prompt: true,
-  tool: true,
-  knowledgebase: true,
+  tools: true,
+  knowledgebases: true,
   config: true,
 }).partial();
 
