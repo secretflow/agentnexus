@@ -10,7 +10,7 @@ import { Radar } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export function RecallConfigForm({
+export function ModelConfigForm({
   config,
   onSuccess,
   onClose,

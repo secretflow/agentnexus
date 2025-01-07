@@ -12,14 +12,17 @@ const ChatKnowledgebaseSchema = z.object({
   enabled: z.boolean().describe("The enabled of the knowledgebase."),
 });
 
+export const RecallConfigSchema = z.object({
+  topK: z.number().describe("The topK of the recall."),
+  score: z.number().describe("The score of the recall."),
+  semantics: z.number().describe("The semantics of the recall."),
+});
+
+export const ModelConfigSchema = z.object({});
+
 export const ChatConfigSchema = z.object({
-  recall: z
-    .object({
-      topK: z.number().describe("The topK of the recall."),
-      score: z.number().describe("The score of the recall."),
-      semantics: z.number().describe("The semantics of the recall."),
-    })
-    .describe("The recall of the config."),
+  recall: RecallConfigSchema.optional().describe("The recall of the chatconfig."),
+  modelSetting: ModelConfigSchema.optional().describe("The model settings of the chatconfig."),
 });
 
 export const ChatAppSchema = z.object({
@@ -34,6 +37,14 @@ export const ChatAppSchema = z.object({
   updatedAt: z.date().describe("The updated timestamp of the chatapp."),
 });
 
+export const UpsertChatAppSchema = ChatAppSchema.pick({
+  model: true,
+  prompt: true,
+  tools: true,
+  knowledgebases: true,
+  config: true,
+}).partial();
+
 export const ChatSchema = z.object({
   id: z.string().describe("The id of the chat."),
   title: z.string().describe("The title of the chat."),
@@ -41,6 +52,13 @@ export const ChatSchema = z.object({
   clientId: z.string().describe("The clientId of the chat."),
   createdAt: z.date().describe("The created timestamp of the chat."),
   updatedAt: z.date().describe("The updated timestamp of the chat."),
+});
+
+export const CreateChatSchema = ChatSchema.pick({
+  id: true,
+  title: true,
+  chatAppId: true,
+  clientId: true,
 });
 
 export const ChatMessageSchema = z.object({
@@ -58,21 +76,6 @@ export const MessageVoteSchema = z.object({
   isUpvoted: z.boolean().describe("The isUpvoted of the vote."),
 });
 
-export const UpsertChatAppSchema = ChatAppSchema.pick({
-  model: true,
-  prompt: true,
-  tools: true,
-  knowledgebases: true,
-  config: true,
-}).partial();
-
-export const CreateChatSchema = ChatSchema.pick({
-  id: true,
-  title: true,
-  chatAppId: true,
-  clientId: true,
-});
-
 export const CreateChatMessageSchema = ChatMessageSchema.pick({
   id: true,
   chatId: true,
@@ -82,8 +85,10 @@ export const CreateChatMessageSchema = ChatMessageSchema.pick({
 
 export type ChatAppProps = z.infer<typeof ChatAppSchema>;
 export type UpsertChatAppProps = z.infer<typeof UpsertChatAppSchema>;
+
 export type ChatToolProps = z.infer<typeof ChatToolSchema>;
 export type ChatKnowledgebaseProps = z.infer<typeof ChatKnowledgebaseSchema>;
+export type RecallConfigProps = z.infer<typeof RecallConfigSchema>;
 export type ChatConfigProps = z.infer<typeof ChatConfigSchema>;
 
 export type ChatProps = z.infer<typeof ChatSchema>;
@@ -91,5 +96,4 @@ export type CreateChatProps = z.infer<typeof CreateChatSchema>;
 
 export type ChatMessageProps = z.infer<typeof ChatMessageSchema>;
 export type CreateChatMessageProps = z.infer<typeof CreateChatMessageSchema>;
-
 export type VoteProps = z.infer<typeof MessageVoteSchema>;

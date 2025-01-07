@@ -2,7 +2,7 @@
 
 import { RecallConfigForm } from "@/components/knowledgebase/recall-config-form";
 import { Modal } from "@/components/ui";
-import type { ChatConfigProps } from "@/lib/zod";
+import type { RecallConfigProps } from "@/lib/zod";
 import { type Dispatch, type SetStateAction, useCallback, useMemo, useState } from "react";
 
 function RecallConfigModal({
@@ -11,8 +11,8 @@ function RecallConfigModal({
   showRecallConfigModal,
   setShowRecallConfigModal,
 }: {
-  config?: ChatConfigProps["recall"];
-  onSubmit?: (data: ChatConfigProps["recall"]) => void;
+  config?: RecallConfigProps;
+  onSubmit?: (data: RecallConfigProps) => void;
   showRecallConfigModal: boolean;
   setShowRecallConfigModal: Dispatch<SetStateAction<boolean>>;
 }) {
@@ -38,8 +38,8 @@ export function useRecallConfigModal({
   config,
   onSubmit,
 }: {
-  config?: ChatConfigProps["recall"];
-  onSubmit?: (data: ChatConfigProps["recall"]) => void;
+  config?: RecallConfigProps;
+  onSubmit?: (data: RecallConfigProps) => void;
 } = {}) {
   const [showRecallConfigModal, setShowRecallConfigModal] = useState(false);
 
