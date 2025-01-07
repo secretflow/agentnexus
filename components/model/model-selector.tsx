@@ -23,11 +23,13 @@ export function ModelSelector({
   onChange,
   type = "all",
   className,
+  commandClassName,
 }: {
   value: ModelProps | null | undefined;
   onChange: (value: ModelProps) => void;
   type?: "all" | "language" | "embedding";
   className?: string;
+  commandClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const { modelProviders, loading } = useModelProviders();
@@ -49,7 +51,7 @@ export function ModelSelector({
         openPopover={open}
         setOpenPopover={setOpen}
         content={
-          <Command loop className="w-[564px]">
+          <Command loop className={commandClassName}>
             <CommandList className="h-[var(--cmdk-list-height)] max-h-[400px]">
               <CommandInput placeholder="搜索模型..." />
               <CommandEmpty className="flex h-[60px] items-center justify-center text-gray-500 text-sm">

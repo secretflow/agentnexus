@@ -1,5 +1,5 @@
 import { findRelevantContent, generateSimilarQuestions } from "@/lib/ai";
-import { DEFAULT_RECALL_CONFIG, TOOL_ATTRS } from "@/lib/constants";
+import { DEFAULT_MODEL, DEFAULT_RECALL_CONFIG, TOOL_ATTRS } from "@/lib/constants";
 import { getLanguageModel } from "@/lib/model";
 import type { ChatConfigProps } from "@/lib/zod";
 import { createAIFunction } from "@agentic/core";
@@ -12,7 +12,7 @@ registerToolProvider({
 
   async call(question: string, knowledgebaseIds: string[], config: ChatConfigProps | undefined) {
     const questions = await generateSimilarQuestions({
-      model: getLanguageModel("openai", "gpt-4o-mini")!,
+      model: getLanguageModel(DEFAULT_MODEL.provider, DEFAULT_MODEL.id)!,
       question,
     });
     const results = await findRelevantContent(

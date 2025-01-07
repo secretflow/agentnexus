@@ -1,7 +1,7 @@
 import { NODE_ATTRS } from "@/lib/constants";
 import { getLanguageModel } from "@/lib/model";
 import { log } from "@/lib/utils";
-import type { ModelProps } from "@/lib/zod";
+import type { ModelConfigProps, ModelProps } from "@/lib/zod";
 import type { VariableProps } from "@/lib/zod";
 import { generateObject } from "ai";
 import { FailureWorkReport, SuccessWorkReport } from "../report";
@@ -10,6 +10,7 @@ import { type Work, type WorkContext, WorkStatus } from "../work";
 
 export type LLMWorkConfig = {
   model: ModelProps;
+  modelSettings?: ModelConfigProps;
   system?: string;
   prompt: string;
   variables: VariableProps[];
@@ -26,7 +27,7 @@ class LLMWork implements Work {
   }
 
   async call(workContext: WorkContext) {
-    const { model, system, prompt, variables } = this.config;
+    const { model, system, prompt, variables, modelSettings } = this.config;
 
     const formattedSystem = system ? interpolateString(system, workContext) : undefined;
     const formattedPrompt = interpolateString(prompt, workContext);
@@ -55,6 +56,7 @@ class LLMWork implements Work {
         system: formattedSystem,
         prompt: formattedPrompt,
         schema: variablesToZod(variables),
+        ...modelSettings,
       });
 
       workContext.set(this.id, {

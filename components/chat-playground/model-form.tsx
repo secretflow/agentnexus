@@ -30,9 +30,10 @@ export function ModelSelectorForm({
       <div className="flex items-center space-x-2">
         <ModelSelector
           type="language"
-          className="h-10 w-[564px]"
           value={model || null}
           onChange={onModelChange}
+          className="h-10 w-[564px]"
+          commandClassName="w-[564px]"
         />
         <Button
           variant="secondary"
