@@ -49,7 +49,7 @@ export function ModelSelector({
         openPopover={open}
         setOpenPopover={setOpen}
         content={
-          <Command loop className="w-[600px]">
+          <Command loop className="w-[564px]">
             <CommandList className="h-[var(--cmdk-list-height)] max-h-[400px]">
               <CommandInput placeholder="搜索模型..." />
               <CommandEmpty className="flex h-[60px] items-center justify-center text-gray-500 text-sm">

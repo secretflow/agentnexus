@@ -4,7 +4,7 @@ import { useRecallConfigModal } from "@/components/modals";
 import { Button, Switch } from "@/components/ui";
 import { useKnowledgebases } from "@/lib/swr";
 import { cn } from "@/lib/utils";
-import type { ChatConfigProps, ChatKnowledgebaseProps, KnowledgebaseProps } from "@/lib/zod";
+import type { ChatKnowledgebaseProps, KnowledgebaseProps, RecallConfigProps } from "@/lib/zod";
 import { Settings2, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 import { useMemo } from "react";
@@ -22,8 +22,8 @@ export function KnowledgebasesAddBlock({
 }: {
   knowledgebases: ChatKnowledgebaseProps[] | undefined | null;
   onKnowledgebasesChange: (value: ChatKnowledgebaseProps[]) => void;
-  recallConfig?: ChatConfigProps["recall"];
-  onRecallConfigChange?: (value: ChatConfigProps["recall"]) => void;
+  recallConfig?: RecallConfigProps;
+  onRecallConfigChange?: (value: RecallConfigProps) => void;
   title?: string;
   description?: string;
   enableSwitch?: boolean;

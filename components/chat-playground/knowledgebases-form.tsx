@@ -1,5 +1,5 @@
 import { KnowledgebasesAddBlock } from "@/components/knowledgebase";
-import type { ChatConfigProps, ChatKnowledgebaseProps } from "@/lib/zod";
+import type { ChatKnowledgebaseProps, RecallConfigProps } from "@/lib/zod";
 
 export function KnowledgebasesForm({
   knowledgebases,
@@ -9,8 +9,8 @@ export function KnowledgebasesForm({
 }: {
   knowledgebases: ChatKnowledgebaseProps[] | undefined | null;
   onKnowledgebasesChange: (value: ChatKnowledgebaseProps[]) => void;
-  recallConfig?: ChatConfigProps["recall"];
-  onRecallConfigChange?: (value: ChatConfigProps["recall"]) => void;
+  recallConfig?: RecallConfigProps;
+  onRecallConfigChange?: (value: RecallConfigProps) => void;
 }) {
   return (
     <KnowledgebasesAddBlock
