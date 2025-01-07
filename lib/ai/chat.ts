@@ -95,6 +95,7 @@ export async function createChatResponse({
           isEnabled: true,
           functionId: "stream-text",
         },
+        ...config?.modelSetting,
       });
 
       result.mergeIntoDataStream(dataStream);

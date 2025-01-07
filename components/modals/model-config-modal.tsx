@@ -2,7 +2,7 @@
 
 import { ModelConfigForm } from "@/components/model/model-config-form";
 import { Modal } from "@/components/ui";
-import type { RecallConfigProps } from "@/lib/zod";
+import type { ModelConfigProps } from "@/lib/zod";
 import { type Dispatch, type SetStateAction, useCallback, useMemo, useState } from "react";
 
 function ModelConfigModal({
@@ -11,8 +11,8 @@ function ModelConfigModal({
   showModelConfigModal,
   setShowModelConfigModal,
 }: {
-  config?: RecallConfigProps;
-  onSubmit?: (data: RecallConfigProps) => void;
+  config?: ModelConfigProps;
+  onSubmit?: (data: ModelConfigProps) => void;
   showModelConfigModal: boolean;
   setShowModelConfigModal: Dispatch<SetStateAction<boolean>>;
 }) {
@@ -38,8 +38,8 @@ export function useModelConfigModal({
   config,
   onSubmit,
 }: {
-  config?: RecallConfigProps;
-  onSubmit?: (data: RecallConfigProps) => void;
+  config?: ModelConfigProps;
+  onSubmit?: (data: ModelConfigProps) => void;
 } = {}) {
   const [showModelConfigModal, setShowModelConfigModal] = useState(false);
 

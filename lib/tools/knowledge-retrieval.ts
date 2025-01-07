@@ -1,5 +1,5 @@
 import { findRelevantContent, generateSimilarQuestions } from "@/lib/ai";
-import { TOOL_ATTRS } from "@/lib/constants";
+import { DEFAULT_RECALL_CONFIG, TOOL_ATTRS } from "@/lib/constants";
 import { getLanguageModel } from "@/lib/model";
 import type { ChatConfigProps } from "@/lib/zod";
 import { createAIFunction } from "@agentic/core";
@@ -18,8 +18,8 @@ registerToolProvider({
     const results = await findRelevantContent(
       questions,
       knowledgebaseIds,
-      config?.recall?.score || 0.3,
-      config?.recall?.topK || 3,
+      config?.recall?.score || DEFAULT_RECALL_CONFIG.score,
+      config?.recall?.topK || DEFAULT_RECALL_CONFIG.topK,
     );
     return results;
   },
@@ -44,8 +44,8 @@ registerToolProvider({
         const results = await findRelevantContent(
           questions,
           knowledgebaseIds,
-          config?.recall?.score || 0.3,
-          config?.recall?.topK || 3,
+          config?.recall?.score || DEFAULT_RECALL_CONFIG.score,
+          config?.recall?.topK || DEFAULT_RECALL_CONFIG.topK,
         );
         return results;
       },

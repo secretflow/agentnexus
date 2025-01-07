@@ -3,7 +3,6 @@ import type { UpsertChatAppProps } from "@/lib/zod";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useDebouncedCallback } from "use-debounce";
 import { Chat } from "./chat";
 import { KnowledgebasesForm } from "./knowledgebases-form";
 import { ModelSelectorForm } from "./model-form";
@@ -46,8 +45,6 @@ export function ChatPlayground() {
     });
   };
 
-  const debouncedHandleSubmit = useDebouncedCallback(handleSubmit, 2000);
-
   if (!chatApplication) {
     return null;
   }
@@ -56,17 +53,26 @@ export function ChatPlayground() {
     <div className="flex w-full flex-col gap-8 py-6 sm:flex-row">
       <div className="max-h-[calc(100vh_-_230px)] flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-white text-gray-700">
         <ModelSelectorForm
-          value={chatAppConfigs.model}
-          onValueChange={(model) => {
+          model={chatAppConfigs.model}
+          onModelChange={(model) => {
             setChatAppConfigs((prev) => ({ ...prev, model }));
             handleSubmit({ model });
+          }}
+          config={chatAppConfigs.config?.modelSetting}
+          onConfigChange={(modelSetting) => {
+            if (modelSetting) {
+              setChatAppConfigs((prev) => ({ ...prev, config: { ...prev.config, modelSetting } }));
+              handleSubmit({ config: { ...chatAppConfigs.config, modelSetting } }, () => {
+                toast.success("模型配置已更新");
+              });
+            }
           }}
         />
         <PromptForm
           value={chatAppConfigs.prompt}
           onValueChange={(prompt) => {
             setChatAppConfigs((prev) => ({ ...prev, prompt }));
-            debouncedHandleSubmit({ prompt });
+            handleSubmit({ prompt });
           }}
         />
         <ToolsForm

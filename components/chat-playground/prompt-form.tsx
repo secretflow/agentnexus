@@ -13,7 +13,7 @@ export function PromptForm({
         <h2 className="font-medium text-xl">提示词</h2>
         <p className="text-gray-500 text-sm">对 AI 发出指令或者约束</p>
       </div>
-      <Textarea rows={4} value={value || ""} onChange={(e) => onValueChange(e.target.value)} />
+      <Textarea rows={4} defaultValue={value || ""} onBlur={(e) => onValueChange(e.target.value)} />
     </div>
   );
 }

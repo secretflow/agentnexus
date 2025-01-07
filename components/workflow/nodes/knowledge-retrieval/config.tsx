@@ -1,6 +1,6 @@
 import { VariableEditor } from "@/components/editor";
 import { KnowledgebasesAddBlock } from "@/components/knowledgebase";
-import { TOOL_ATTRS } from "@/lib/constants";
+import { DEFAULT_RECALL_CONFIG, TOOL_ATTRS } from "@/lib/constants";
 import type { KnowledgeRetrievalConfig } from "@/lib/workflow";
 import { VariableConfig, useVariableRefs } from "../../variable";
 import { registerNodeConfig } from "../registry";
@@ -9,11 +9,7 @@ const defaultConfig: KnowledgeRetrievalConfig = {
   question: "",
   knowledgebases: [],
   chatConfig: {
-    recall: {
-      topK: 3,
-      score: 0.3,
-      semantics: 1,
-    },
+    recall: DEFAULT_RECALL_CONFIG,
   },
   variables: [
     {

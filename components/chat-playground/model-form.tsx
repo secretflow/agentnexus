@@ -1,15 +1,26 @@
+import { useModelConfigModal } from "@/components/modals";
 import { ModelSelector } from "@/components/model";
 import { Button } from "@/components/ui";
-import type { ModelProps } from "@/lib/zod";
+import type { ModelConfigProps, ModelProps } from "@/lib/zod";
 import { Settings2 } from "lucide-react";
 
 export function ModelSelectorForm({
-  value,
-  onValueChange,
+  model,
+  onModelChange,
+  config,
+  onConfigChange,
 }: {
-  value: ModelProps | null | undefined;
-  onValueChange: (value: ModelProps) => void;
+  model: ModelProps | null | undefined;
+  onModelChange: (value: ModelProps) => void;
+  config?: ModelConfigProps;
+  onConfigChange?: (value: ModelConfigProps) => void;
 }) {
+  const { ModelConfigModal, setShowModelConfigModal } = useModelConfigModal({
+    config,
+    onSubmit(modelConfig) {
+      onConfigChange?.(modelConfig);
+    },
+  });
   return (
     <div className="relative flex flex-col space-y-4 px-6 py-4">
       <div className="flex flex-col space-y-3">
@@ -20,16 +31,19 @@ export function ModelSelectorForm({
         <ModelSelector
           type="language"
           className="h-10 w-[564px]"
-          value={value || null}
-          onChange={onValueChange}
+          value={model || null}
+          onChange={onModelChange}
         />
         <Button
           variant="secondary"
           className="size-10 px-0"
-          onClick={() => {}}
+          onClick={() => {
+            setShowModelConfigModal(true);
+          }}
           icon={<Settings2 className="size-4 text-gray-500" />}
         />
       </div>
+      <ModelConfigModal />
     </div>
   );
 }

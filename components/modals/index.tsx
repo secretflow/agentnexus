@@ -11,3 +11,4 @@ export * from "./delete-application-modal";
 export * from "./delete-account-modal";
 export * from "./splitter-config-modal";
 export * from "./recall-config-modal";
+export * from "./model-config-modal";
