@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowTurnLeft, X } from "@/components/icons";
-import { Button, InfoTooltip, Input, Label, Slider } from "@/components/ui";
-import { useMediaQuery } from "@/lib/hooks";
-import { ChatConfigSchema, type RecallConfigProps } from "@/lib/zod";
+import { X } from "@/components/icons";
+import { Button, InfoTooltip, Label, Slider } from "@/components/ui";
+import { DEFAULT_MODEL_CONFIG } from "@/lib/constants";
+import { type ModelConfigProps, ModelConfigSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import NumberFlow from "@number-flow/react";
 import { Radar } from "lucide-react";
@@ -15,31 +15,36 @@ export function ModelConfigForm({
   onSuccess,
   onClose,
 }: {
-  config?: RecallConfigProps;
-  onSuccess?: (data: RecallConfigProps) => void;
+  config?: ModelConfigProps;
+  onSuccess?: (data: ModelConfigProps) => void;
   onClose?: () => void;
 }) {
-  const { isMobile } = useMediaQuery();
+  const [temperature, setTemperature] = useState(
+    config?.temperature || DEFAULT_MODEL_CONFIG.temperature,
+  );
+  const [maxTokens, setMaxTokens] = useState(config?.maxTokens || DEFAULT_MODEL_CONFIG.maxTokens);
+  const [presencePenalty, setPresencePenalty] = useState(
+    config?.presencePenalty || DEFAULT_MODEL_CONFIG.presencePenalty,
+  );
+  const [frequencyPenalty, setFrequencyPenalty] = useState(
+    config?.frequencyPenalty || DEFAULT_MODEL_CONFIG.frequencyPenalty,
+  );
 
   const {
-    register,
     handleSubmit,
-    formState: { isSubmitting, errors },
-  } = useForm<RecallConfigProps>({
-    resolver: zodResolver(ChatConfigSchema.shape.recall),
-    defaultValues: config || {
-      topK: 3,
-      score: 0.3,
-      semantics: 1,
-    },
+    formState: { isSubmitting },
+  } = useForm<ModelConfigProps>({
+    resolver: zodResolver(ModelConfigSchema),
+    defaultValues: config || DEFAULT_MODEL_CONFIG,
   });
 
-  const [semantics, setSemantics] = useState(1);
-
-  const onSubmit = handleSubmit(async (data: RecallConfigProps) => {
+  const onSubmit = handleSubmit(async (data: ModelConfigProps) => {
     onSuccess?.({
       ...data,
-      semantics,
+      temperature,
+      maxTokens,
+      presencePenalty,
+      frequencyPenalty,
     });
   });
 
@@ -50,7 +55,7 @@ export function ModelConfigForm({
           <div className="flex size-6 items-center justify-center rounded-full bg-gray-100 px-0 sm:size-6 [&>*]:size-3 sm:[&>*]:size-4">
             <Radar className="size-4" />
           </div>
-          <h3 className="!mt-0 max-w-sm truncate font-medium text-lg">召回配置</h3>
+          <h3 className="!mt-0 max-w-sm truncate font-medium text-lg">模型参数配置</h3>
         </div>
         <div className="flex items-center gap-4">
           <Button
@@ -63,97 +68,127 @@ export function ModelConfigForm({
       </div>
 
       <div className="space-y-6 px-6 py-4">
-        <div>
-          <Label htmlFor="semantics" className="flex items-center space-x-1 text-gray-700">
-            <p>权重</p>
-            <InfoTooltip content="配置语义检索和关键字检索的权重占比" />
+        <div className="grid grid-cols-10">
+          <Label
+            htmlFor="temperature"
+            className="col-span-3 flex items-center space-x-1 text-gray-700"
+          >
+            <p>温度</p>
+            <InfoTooltip content="温度影响生成结果的随机性， 0 意味着几乎是确定性的结果，较高的值意味着更多的随机性" />
           </Label>
-          <div className="mt-2">
+          <div className="col-span-6 flex items-center">
             <Slider
-              id="semantics"
-              defaultValue={[1]}
+              id="temperature"
+              value={[temperature]}
               min={0}
               max={1}
               step={0.1}
-              onValueChange={(value) => setSemantics(value[0])}
-              autoFocus={!isMobile}
+              onValueChange={(value) => setTemperature(value[0])}
             />
-            <div className="mt-1 flex justify-between text-gray-500 text-sm">
-              <div className="space-x-1">
-                <span>语义</span>
-                <NumberFlow
-                  willChange
-                  value={semantics}
-                  isolate
-                  continuous
-                  opacityTiming={{
-                    duration: 250,
-                    easing: "ease-out",
-                  }}
-                />
-              </div>
-              <div className="space-x-1">
-                <span>关键字</span>
-                <NumberFlow
-                  willChange
-                  value={1 - semantics}
-                  isolate
-                  continuous
-                  opacityTiming={{
-                    duration: 250,
-                    easing: "ease-out",
-                  }}
-                />
-              </div>
-            </div>
+          </div>
+          <div className="col-span-1 pl-2 text-gray-500">
+            <NumberFlow
+              willChange
+              value={temperature}
+              isolate
+              continuous
+              opacityTiming={{
+                duration: 250,
+                easing: "ease-out",
+              }}
+            />
           </div>
         </div>
-      </div>
 
-      <div className="space-y-6 px-6 py-4">
-        <div>
-          <Label htmlFor="topK" className="flex items-center space-x-1 text-gray-700">
-            <p>TopK</p>
-            <InfoTooltip content="筛选出与用户问题相关的文本片段数量" />
+        <div className="grid grid-cols-10">
+          <Label htmlFor="score" className="col-span-3 flex items-center space-x-1 text-gray-700">
+            <p>最大生成 Tokens</p>
           </Label>
-          <div className="mt-2">
-            <Input
-              id="topK"
-              type="number"
-              autoComplete="off"
-              placeholder="输入 TopK"
+          <div className="col-span-6 flex items-center">
+            <Slider
+              id="maxTokens"
+              value={[maxTokens]}
               min={1}
-              {...register("topK", {
-                required: true,
-                valueAsNumber: true,
-              })}
+              max={4096}
+              step={100}
+              onValueChange={(value) => setMaxTokens(value[0])}
             />
-            {errors.topK && <p className="mt-2 text-red-600 text-sm">{errors.topK.message}</p>}
+          </div>
+          <div className="col-span-1 pl-2 text-gray-500">
+            <NumberFlow
+              willChange
+              value={maxTokens}
+              isolate
+              continuous
+              opacityTiming={{
+                duration: 250,
+                easing: "ease-out",
+              }}
+            />
           </div>
         </div>
-      </div>
 
-      <div className="space-y-6 px-6 py-4">
-        <div>
-          <Label htmlFor="score" className="flex items-center space-x-1 text-gray-700">
-            <p>Score</p>
-            <InfoTooltip content="文本片段与用户问题相识度阈值" />
+        <div className="grid grid-cols-10">
+          <Label
+            htmlFor="presencePenalty"
+            className="col-span-3 flex items-center space-x-1 text-gray-700"
+          >
+            <p>存在惩罚</p>
+            <InfoTooltip content="存在惩罚会影响模型重复提示中已有信息的可能性，0 意味着没有惩罚。" />
           </Label>
-          <div className="mt-2">
-            <Input
-              id="score"
-              type="number"
-              autoComplete="off"
-              placeholder="输入 Score"
-              step={0.01}
-              min={0.1}
+          <div className="col-span-6 flex items-center">
+            <Slider
+              id="presencePenalty"
+              value={[presencePenalty]}
+              min={0}
               max={1}
-              {...register("score", {
-                required: true,
-                valueAsNumber: true,
-              })}
+              step={0.1}
+              onValueChange={(value) => setPresencePenalty(value[0])}
             />
-            {errors.score && <p className="mt-2 text-red-600 text-sm">{errors.score.message}</p>}
+          </div>
+          <div className="col-span-1 pl-2 text-gray-500">
+            <NumberFlow
+              willChange
+              value={presencePenalty}
+              isolate
+              continuous
+              opacityTiming={{
+                duration: 250,
+                easing: "ease-out",
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-10">
+          <Label
+            htmlFor="frequencyPenalty"
+            className="col-span-3 flex items-center space-x-1 text-gray-700"
+          >
+            <p>频率惩罚</p>
+            <InfoTooltip content="频率惩罚会影响模型重复使用相同单词或短语的可能性，0 意味着没有惩罚。" />
+          </Label>
+          <div className="col-span-6 flex items-center">
+            <Slider
+              id="frequencyPenalty"
+              value={[frequencyPenalty]}
+              min={0}
+              max={1}
+              step={0.1}
+              onValueChange={(value) => setFrequencyPenalty(value[0])}
+            />
+          </div>
+          <div className="col-span-1 pl-2 text-gray-500">
+            <NumberFlow
+              willChange
+              value={frequencyPenalty}
+              isolate
+              continuous
+              opacityTiming={{
+                duration: 250,
+                easing: "ease-out",
+              }}
+            />
           </div>
         </div>
       </div>
@@ -163,15 +198,8 @@ export function ModelConfigForm({
           type="submit"
           loading={isSubmitting}
           disabled={isSubmitting}
-          text={
-            <span className="flex items-center gap-2">
-              <span>保存</span>
-              <div className="rounded border border-white/20 p-1">
-                <ArrowTurnLeft className="size-3.5" />
-              </div>
-            </span>
-          }
-          className="h-8 w-fit pr-1.5 pl-2.5"
+          text="保存"
+          className="h-8 w-fit"
         />
       </div>
     </form>

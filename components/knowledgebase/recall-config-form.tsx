@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowTurnLeft, X } from "@/components/icons";
+import { X } from "@/components/icons";
 import { Button, InfoTooltip, Input, Label, Slider } from "@/components/ui";
+import { DEFAULT_RECALL_CONFIG } from "@/lib/constants";
 import { useMediaQuery } from "@/lib/hooks";
-import { ChatConfigSchema, type RecallConfigProps } from "@/lib/zod";
+import { type RecallConfigProps, RecallConfigSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import NumberFlow from "@number-flow/react";
 import { Radar } from "lucide-react";
@@ -26,15 +27,11 @@ export function RecallConfigForm({
     handleSubmit,
     formState: { isSubmitting, errors },
   } = useForm<RecallConfigProps>({
-    resolver: zodResolver(ChatConfigSchema.shape.recall),
-    defaultValues: config || {
-      topK: 3,
-      score: 0.3,
-      semantics: 1,
-    },
+    resolver: zodResolver(RecallConfigSchema),
+    defaultValues: config || DEFAULT_RECALL_CONFIG,
   });
 
-  const [semantics, setSemantics] = useState(1);
+  const [semantics, setSemantics] = useState(config?.semantics || DEFAULT_RECALL_CONFIG.semantics);
 
   const onSubmit = handleSubmit(async (data: RecallConfigProps) => {
     onSuccess?.({
@@ -71,7 +68,7 @@ export function RecallConfigForm({
           <div className="mt-2">
             <Slider
               id="semantics"
-              defaultValue={[1]}
+              value={[semantics]}
               min={0}
               max={1}
               step={0.1}
@@ -163,15 +160,8 @@ export function RecallConfigForm({
           type="submit"
           loading={isSubmitting}
           disabled={isSubmitting}
-          text={
-            <span className="flex items-center gap-2">
-              <span>保存</span>
-              <div className="rounded border border-white/20 p-1">
-                <ArrowTurnLeft className="size-3.5" />
-              </div>
-            </span>
-          }
-          className="h-8 w-fit pr-1.5 pl-2.5"
+          text="保存"
+          className="h-8 w-fit"
         />
       </div>
     </form>

@@ -18,7 +18,12 @@ export const RecallConfigSchema = z.object({
   semantics: z.number().describe("The semantics of the recall."),
 });
 
-export const ModelConfigSchema = z.object({});
+export const ModelConfigSchema = z.object({
+  temperature: z.number().min(0).max(1).describe("The temperature of the model."),
+  maxTokens: z.number().min(1).max(4096).describe("The maxTokens of the model."),
+  presencePenalty: z.number().min(0).max(1).describe("The presencePenalty of the model."),
+  frequencyPenalty: z.number().min(0).max(1).describe("The frequencyPenalty of the model."),
+});
 
 export const ChatConfigSchema = z.object({
   recall: RecallConfigSchema.optional().describe("The recall of the chatconfig."),
@@ -89,6 +94,7 @@ export type UpsertChatAppProps = z.infer<typeof UpsertChatAppSchema>;
 export type ChatToolProps = z.infer<typeof ChatToolSchema>;
 export type ChatKnowledgebaseProps = z.infer<typeof ChatKnowledgebaseSchema>;
 export type RecallConfigProps = z.infer<typeof RecallConfigSchema>;
+export type ModelConfigProps = z.infer<typeof ModelConfigSchema>;
 export type ChatConfigProps = z.infer<typeof ChatConfigSchema>;
 
 export type ChatProps = z.infer<typeof ChatSchema>;
