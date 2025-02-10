@@ -82,7 +82,7 @@ export function insertVariableRefAtCaret(variableRef: VariableRefDetail) {
   }
 }
 
-export function parseValue(value: string, availableVariableRefs: VariableRefGroup[]) {
+export function parseVariableValue(value: string, availableVariableRefs: VariableRefGroup[]) {
   let parsedHtml = "";
   const segments = value.split("\n").filter((s) => s.trim() !== "");
 
@@ -121,7 +121,7 @@ export function parseValue(value: string, availableVariableRefs: VariableRefGrou
   });
 }
 
-export function formatValue(elem: HTMLDivElement) {
+export function formatVariableValue(elem: HTMLDivElement) {
   const results: string[] = [];
   const childNodes = elem.childNodes;
   for (let i = 0; i < childNodes.length; i++) {

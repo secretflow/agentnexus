@@ -1,5 +1,5 @@
 import type { VariableRefGroup } from "@/components/workflow/variable";
-import { VariableEditor } from "./editor";
+import { VariableEditor } from "./variable-editor";
 
 export enum ChatMessageRole {
   System = "system",

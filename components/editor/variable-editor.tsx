@@ -4,7 +4,12 @@ import { createElement, useEffect, useRef, useState } from "react";
 import { type Root, createRoot } from "react-dom/client";
 import tippy from "tippy.js";
 import { useDebouncedCallback } from "use-debounce";
-import { formatValue, insertVariableRefAtCaret, moveCaretToEnd, parseValue } from "./util";
+import {
+  formatVariableValue,
+  insertVariableRefAtCaret,
+  moveCaretToEnd,
+  parseVariableValue,
+} from "./util";
 
 export function VariableEditor({
   defaultValue,
@@ -25,7 +30,7 @@ export function VariableEditor({
     // If the editor is focused, don't update the value
     // otherwise the user will lose their cursor position
     if (!ref.current || editorFocused) return;
-    ref.current.innerHTML = parseValue(defaultValue, availableVariableRefs);
+    ref.current.innerHTML = parseVariableValue(defaultValue, availableVariableRefs);
   }, [availableVariableRefs, editorFocused]);
 
   const handleSlashCommand = () => {
@@ -78,7 +83,7 @@ export function VariableEditor({
   };
 
   const debouncedOnChange = useDebouncedCallback(() => {
-    onChange(formatValue(ref.current!));
+    onChange(formatVariableValue(ref.current!));
   }, 200);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
