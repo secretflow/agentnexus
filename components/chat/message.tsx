@@ -7,7 +7,14 @@ import type { Message } from "ai";
 import equal from "fast-deep-equal";
 import { motion } from "framer-motion";
 import { memo } from "react";
-import { Firecrawl, KnowledgeRetrieval, PythonConsole, Weather, WebSearch } from "./cards";
+import {
+  AutoPlaywright,
+  Firecrawl,
+  KnowledgeRetrieval,
+  PythonConsole,
+  Weather,
+  WebSearch,
+} from "./cards";
 import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { PreviewAttachment } from "./preview-attachment";
@@ -76,6 +83,8 @@ const PurePreviewMessage = ({
                         <WebSearch result={result} args={args} />
                       ) : toolName === TOOL_ATTRS.firecrawl.toolName ? (
                         <Firecrawl result={result} args={args} />
+                      ) : toolName === TOOL_ATTRS.autoPlaywright.toolName ? (
+                        <AutoPlaywright result={result} />
                       ) : (
                         <pre>{JSON.stringify(result, null, 2)}</pre>
                       )}
@@ -94,6 +103,8 @@ const PurePreviewMessage = ({
                         <WebSearch loading args={args} />
                       ) : toolName === TOOL_ATTRS.firecrawl.toolName ? (
                         <Firecrawl loading args={args} />
+                      ) : toolName === TOOL_ATTRS.autoPlaywright.toolName ? (
+                        <AutoPlaywright loading />
                       ) : null}
                     </div>
                   );

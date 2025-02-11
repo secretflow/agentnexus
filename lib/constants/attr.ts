@@ -1,5 +1,5 @@
 import { Book, CloudSun, End, Fire, Globe2 } from "@/components/icons";
-import { CodeXml, House, Package } from "lucide-react";
+import { BrickWall, CodeXml, House, Package } from "lucide-react";
 
 export enum SCENE {
   workflow = "workflow",
@@ -85,6 +85,14 @@ export const TOOL_ATTRS = {
     introduction: "基于 FireCrawl 进行网络数据抓取",
     icon: Fire,
     toolName: "firecrawl_scrape_url",
+    scene: ["agent"] as SCENE[],
+  },
+  autoPlaywright: {
+    id: "autoPlaywright",
+    name: "UI 自动化",
+    introduction: "使用 Playwright 进行自动化操作",
+    icon: BrickWall,
+    toolName: "auto_playwright",
     scene: ["agent"] as SCENE[],
   },
 };
