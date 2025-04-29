@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm db:generate && next dev --turbopack",
-    "build": "next build",
+    "build": "pnpm db:generate && next build",
     "start": "next start",
     "lint": "biome lint --fix --unsafe",
     "tsc": "tsc --project ./tsconfig.json --noEmit",
