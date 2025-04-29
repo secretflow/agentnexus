@@ -1,0 +1,38 @@
+TOKEN "untitled_pipe_4873_endpoint_read_9337" READ
+
+NODE unique_users
+SQL >
+
+    SELECT DISTINCT ON (client_id) * FROM users_events_mv ORDER BY timestamp DESC
+
+
+
+NODE region_users
+SQL >
+
+    %
+    SELECT region, COUNT(region) as users
+    FROM unique_users
+    WHERE
+        region != 'Unknown'
+        {% if defined(appId) %} AND app_id = {{ String(appId) }} {% end %}
+        {% if defined(device) %} AND device = {{ device }} {% end %}
+        {% if defined(browser) %} AND browser = {{ browser }} {% end %}
+        {% if defined(os) %} AND os = {{ os }} {% end %}
+        {% if defined(referer) %} AND referer = {{ referer }} {% end %}
+        {% if defined(country) %} AND country = {{ country }} {% end %}
+        {% if defined(city) %} AND city = {{ city }} {% end %}
+        {% if defined(region) %} AND region = {{ region }} {% end %}
+        {% if defined(start) %} AND timestamp >= {{ DateTime64(start) }} {% end %}
+        {% if defined(end) %} AND timestamp <= {{ DateTime64(end) }} {% end %}
+    GROUP BY region
+    ORDER BY users DESC
+
+
+
+NODE endpoint
+SQL >
+
+    SELECT * FROM region_users
+
+
