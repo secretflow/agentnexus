@@ -3,7 +3,7 @@ import { withApplication } from "@/lib/auth";
 import type { ChatConfigProps, ChatKnowledgebaseProps, ChatToolProps, ModelProps } from "@/lib/zod";
 import type { Message } from "ai";
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export const POST = withApplication(async ({ req }) => {
   const {

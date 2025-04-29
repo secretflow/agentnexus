@@ -3,7 +3,7 @@ import { withApplication } from "@/lib/auth";
 import { WorkContext, WorkStatus, compileDagToWorkflow } from "@/lib/workflow";
 import { NextResponse } from "next/server";
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export const POST = withApplication(async ({ req }) => {
   const { dag, input } = await parseRequestBody(req);

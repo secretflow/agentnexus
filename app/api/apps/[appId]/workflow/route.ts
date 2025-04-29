@@ -3,7 +3,7 @@ import { withApiKey } from "@/lib/auth";
 import { WorkContext, WorkStatus, compileDagToWorkflow } from "@/lib/workflow";
 import type { GraphModelProps } from "@/lib/zod";
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export const POST = withApiKey(async ({ req, application }) => {
   const params = await parseRequestBody(req);
